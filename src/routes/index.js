@@ -9,4 +9,5 @@ const routes = Router();
 routes.use("/api/products", productRoutes);
 routes.use("/api/category", categoryRoutes);
 routes.use("/api/auth", authRoutes)
+
 export default routes;

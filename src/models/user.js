@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   email: {
     type: String,
-    unique: true,  
+    unique: true, 
+    required: true 
   },
   password: {
     type: String,
@@ -13,7 +14,7 @@ const userSchema = new Schema({
   username: {
     type: String,
     require: true,
-    unique: true
+    unique: [true, "Username đã tồn tại"]
   },
   role: {
     type: String,
@@ -21,7 +22,8 @@ const userSchema = new Schema({
     enum: ["user", "admin","superAdmin"]
   }
 },{
-  timestamps: true
+  timestamps: true,
+  versionKey: false
 });
 
 const User = mongoose.model("User", userSchema);
