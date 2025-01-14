@@ -17,6 +17,7 @@ export const getCategoryById = async (req, res) => {
     const data = await Category.findById(id)
       .populate({
         path: "products",
+        match: { isHidden: false}
       })
       .exec();
     res.status(200).json(data);
@@ -101,7 +102,6 @@ export const deleteCategory = async (req, res) => {
     );
     const updatedProductIds =  await product.find({ category: "67836b1b6555d75d29c79318" }).select("_id");
 
-    // Sửa category mặc định
     await Category.updateOne(
       {
         _id: "67836b1b6555d75d29c79318",
