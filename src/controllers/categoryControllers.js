@@ -1,4 +1,5 @@
 import Category from "../models/category.js";
+import product from "../models/product.js";
 import { errorResponse, successResponse } from "./../utils/returnResponse.js";
 
 export const createCategory = async (req, res) => {
@@ -47,6 +48,7 @@ export const editCategory = async (req, res) => {
 export const softDeleteCategory = async (req, res) => {
   try {
     const id = req.params.id;
+
     const date = new Date();
 
     const data = await Category.findByIdAndUpdate(
@@ -88,12 +90,33 @@ export const unSoftDeleteCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   try {
     const id = req.params.id;
+
+    if (id == "67836b1b6555d75d29c79318") {
+      return errorResponse(res, 400, "Không được xóa danh mục mặc định");
+    }
+
+    await product.updateMany(
+      { category: id },
+      { category: "67836b1b6555d75d29c79318" }
+    );
+    const updatedProductIds =  await product.find({ category: "67836b1b6555d75d29c79318" }).select("_id");
+
+    // Sửa category mặc định
+    await Category.updateOne(
+      {
+        _id: "67836b1b6555d75d29c79318",
+      },
+      { $addToSet: { products: { $each: updatedProductIds.map((p) => p.id.toString()) } } }
+    );
+
     const data = await Category.findByIdAndDelete(id);
+
     if (!data) {
       return errorResponse(res, 404, "Không tìm thấy danh mục tương ứng");
     }
-    successResponse(res, 200, data, "Xóa mềm thành công");
+    successResponse(res, 200, data, "Xóa danh mục thành công");
   } catch (error) {
+    console.log(error);
     errorResponse(res, 500, "Server bị lỗi");
   }
 };

@@ -13,7 +13,7 @@ export const create = async (req, res) => {
   }
 export const getAll = async (req, res) => {
     try {
-      const products = await User.find();
+      const products = await User.find().select("-password");
       res.status(200).json({
         message: "Lấy dữ liệu thành công",
         products,

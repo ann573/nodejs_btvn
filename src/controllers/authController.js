@@ -1,7 +1,7 @@
-import User from "../models/user.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 import { errorResponse, successResponse } from "../utils/returnResponse.js";
 const saltRounds = 10;
 
@@ -31,12 +31,11 @@ export const register = async (req, res) => {
         };
         try {
           const data = await User.create(newUser);
-          const user = await User.findById(data._id).select("-password");
+          data.password = undefined;
 
-          successResponse(res, 201, user, "Tạo tài khoản thành công");
+          successResponse(res, 201, data, "Tạo tài khoản thành công");
         } catch (error) {
-          if (error.code === 11000)
-            errorResponse(res, 400, "Username bị trùng");
+          console.log(error)
           errorResponse(res, 500, "Lỗi khi lưu người dùng");
         }
       });
@@ -58,18 +57,15 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Mật khẩu không đúng" });
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       PRIVATE_KEY,
       { expiresIn: "7d" }
     );
-    const refreshToken = jwt.sign(
-      { userId: user._id, email: user.email },
-      REFRESH_TOKEN
-    );
-    res.status(200).json({ message: "Đăng nhập thành công", token });
+
+    user.password = undefined;
+    successResponse(res, 200, { accessToken, user });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Đã xảy ra lỗi khi đăng nhập" });
   }
 };

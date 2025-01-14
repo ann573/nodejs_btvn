@@ -1,4 +1,3 @@
-// Hàm trả về response thành công
 export const successResponse = (res, statusCode, data, message = 'Thành công') => {
     return res.status(statusCode).json({
       success: true,

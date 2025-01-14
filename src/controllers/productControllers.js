@@ -17,9 +17,11 @@ export const create = async (req, res) => {
 
     const result = await Product.create(req.body);
 
-    const categoryPush = await Category.findById(result.category);
-    categoryPush.products.push(result._id);
-    await categoryPush.save();
+    await Category.updateOne(
+      { _id: result.category }, 
+      { $push: { products: result._id } } 
+    );
+    ;
 
     successResponse(res, 201, result, "Tạo sản phẩm thành công");
   } catch (error) {
